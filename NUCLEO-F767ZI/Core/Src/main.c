@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "string.h"
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -66,6 +67,34 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for GreenLed */
+osThreadId_t GreenLedHandle;
+const osThreadAttr_t GreenLed_attributes = {
+  .name = "GreenLed",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for BlueLed */
+osThreadId_t BlueLedHandle;
+const osThreadAttr_t BlueLed_attributes = {
+  .name = "BlueLed",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for RedLed */
+osThreadId_t RedLedHandle;
+const osThreadAttr_t RedLed_attributes = {
+  .name = "RedLed",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -76,6 +105,11 @@ static void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
+void StartDefaultTask(void *argument);
+void green_led_task(void *argument);
+void blue_led_task(void *argument);
+void red_led_task(void *argument);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -120,6 +154,51 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
+
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* creation of GreenLed */
+  GreenLedHandle = osThreadNew(green_led_task, NULL, &GreenLed_attributes);
+
+  /* creation of BlueLed */
+  BlueLedHandle = osThreadNew(blue_led_task, NULL, &BlueLed_attributes);
+
+  /* creation of RedLed */
+  RedLedHandle = osThreadNew(red_led_task, NULL, &RedLed_attributes);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -366,6 +445,105 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_green_led_task */
+/**
+* @brief Function implementing the GreenLed thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_green_led_task */
+void green_led_task(void *argument)
+{
+  /* USER CODE BEGIN green_led_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(500);
+    GPIO_PinState enable = HAL_GPIO_ReadPin(LD1_GPIO_Port, LD1_Pin);
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, !enable);
+  }
+  /* USER CODE END green_led_task */
+}
+
+/* USER CODE BEGIN Header_blue_led_task */
+/**
+* @brief Function implementing the BlueLed thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_blue_led_task */
+void blue_led_task(void *argument)
+{
+  /* USER CODE BEGIN blue_led_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1000);
+    GPIO_PinState enable = HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin);
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, !enable);
+  }
+  /* USER CODE END blue_led_task */
+}
+
+/* USER CODE BEGIN Header_red_led_task */
+/**
+* @brief Function implementing the RedLed thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_red_led_task */
+void red_led_task(void *argument)
+{
+  /* USER CODE BEGIN red_led_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(2000);
+    GPIO_PinState enable = HAL_GPIO_ReadPin(LD3_GPIO_Port, LD3_Pin);
+    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, !enable);
+  }
+  /* USER CODE END red_led_task */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM14 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM14) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
