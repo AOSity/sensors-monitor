@@ -1,11 +1,10 @@
 TARGET = NUCLEO-F767ZI
-CUBE_DIR = NUCLEO-F767ZI
 BUILD_DIR = build
 
 all: $(BUILD_DIR)/$(TARGET).bin
 
 $(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)
-	cd $(CUBE_DIR) && $(MAKE) BUILD_DIR=../build
+	cd target/$(TARGET) && $(MAKE) BUILD_DIR=../../build
 
 $(BUILD_DIR):
 	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
