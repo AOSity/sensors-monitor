@@ -22,8 +22,8 @@ HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 OPENOCD = openocd
 
-C_INC =
-C_SRC =
+C_INC = $(wildcard module/*/inc)
+C_SRC = $(wildcard module/*/*.c)
 ASM_SRC =
 
 include target/$(TARGET)/specific.mk
