@@ -54,6 +54,13 @@ const osThreadAttr_t Startup_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
+/* Definitions for CLI */
+osThreadId_t CLIHandle;
+const osThreadAttr_t CLI_attributes = {
+  .name = "CLI",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -61,6 +68,7 @@ const osThreadAttr_t Startup_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void startup_task(void *argument);
+void cli_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -94,6 +102,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of Startup */
   StartupHandle = osThreadNew(startup_task, NULL, &Startup_attributes);
 
+  /* creation of CLI */
+  CLIHandle = osThreadNew(cli_task, NULL, &CLI_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -120,6 +131,24 @@ __weak void startup_task(void *argument)
     osDelay(1);
   }
   /* USER CODE END startup_task */
+}
+
+/* USER CODE BEGIN Header_cli_task */
+/**
+* @brief Function implementing the CLI thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_cli_task */
+__weak void cli_task(void *argument)
+{
+  /* USER CODE BEGIN cli_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END cli_task */
 }
 
 /* Private application code --------------------------------------------------*/
