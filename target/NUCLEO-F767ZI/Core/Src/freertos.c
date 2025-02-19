@@ -47,33 +47,12 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for Startup */
+osThreadId_t StartupHandle;
+const osThreadAttr_t Startup_attributes = {
+  .name = "Startup",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for GreenLed */
-osThreadId_t GreenLedHandle;
-const osThreadAttr_t GreenLed_attributes = {
-  .name = "GreenLed",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for BlueLed */
-osThreadId_t BlueLedHandle;
-const osThreadAttr_t BlueLed_attributes = {
-  .name = "BlueLed",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for RedLed */
-osThreadId_t RedLedHandle;
-const osThreadAttr_t RedLed_attributes = {
-  .name = "RedLed",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -81,10 +60,7 @@ const osThreadAttr_t RedLed_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
-void green_led_task(void *argument);
-void blue_led_task(void *argument);
-void red_led_task(void *argument);
+void startup_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -115,17 +91,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  /* creation of GreenLed */
-  GreenLedHandle = osThreadNew(green_led_task, NULL, &GreenLed_attributes);
-
-  /* creation of BlueLed */
-  BlueLedHandle = osThreadNew(blue_led_task, NULL, &BlueLed_attributes);
-
-  /* creation of RedLed */
-  RedLedHandle = osThreadNew(red_led_task, NULL, &RedLed_attributes);
+  /* creation of Startup */
+  StartupHandle = osThreadNew(startup_task, NULL, &Startup_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -137,76 +104,22 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_startup_task */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the Startup thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_startup_task */
+__weak void startup_task(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN startup_task */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END StartDefaultTask */
-}
-
-/* USER CODE BEGIN Header_green_led_task */
-/**
-* @brief Function implementing the GreenLed thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_green_led_task */
-void green_led_task(void *argument)
-{
-  /* USER CODE BEGIN green_led_task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END green_led_task */
-}
-
-/* USER CODE BEGIN Header_blue_led_task */
-/**
-* @brief Function implementing the BlueLed thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_blue_led_task */
-void blue_led_task(void *argument)
-{
-  /* USER CODE BEGIN blue_led_task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END blue_led_task */
-}
-
-/* USER CODE BEGIN Header_red_led_task */
-/**
-* @brief Function implementing the RedLed thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_red_led_task */
-void red_led_task(void *argument)
-{
-  /* USER CODE BEGIN red_led_task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END red_led_task */
+  /* USER CODE END startup_task */
 }
 
 /* Private application code --------------------------------------------------*/
