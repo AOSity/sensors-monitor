@@ -21,7 +21,6 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/freertos.c \
-Core/Src/eth.c \
 Core/Src/usart.c \
 Core/Src/usb_otg.c \
 Core/Src/stm32f7xx_it.c \
@@ -43,7 +42,6 @@ Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_exti.c \
-Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_eth.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart_ex.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd.c \
@@ -61,7 +59,10 @@ Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c \
 Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.c \
 Core/Src/sysmem.c \
-Core/Src/syscalls.c
+Core/Src/syscalls.c \
+Core/Src/spi.c \
+Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.c \
+Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi_ex.c
 C_SRC += $(addprefix target/$(TARGET)/, $(C_SOURCES))
 
 ASM_SOURCES =  \
