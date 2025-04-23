@@ -61,6 +61,13 @@ const osThreadAttr_t CLI_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Screnn */
+osThreadId_t ScrennHandle;
+const osThreadAttr_t Screnn_attributes = {
+  .name = "Screnn",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -69,6 +76,7 @@ const osThreadAttr_t CLI_attributes = {
 
 void startup_task(void *argument);
 void cli_task(void *argument);
+void screen_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -104,6 +112,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of CLI */
   CLIHandle = osThreadNew(cli_task, NULL, &CLI_attributes);
+
+  /* creation of Screnn */
+  ScrennHandle = osThreadNew(screen_task, NULL, &Screnn_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -149,6 +160,24 @@ __weak void cli_task(void *argument)
     osDelay(1);
   }
   /* USER CODE END cli_task */
+}
+
+/* USER CODE BEGIN Header_screen_task */
+/**
+* @brief Function implementing the Screnn thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_screen_task */
+__weak void screen_task(void *argument)
+{
+  /* USER CODE BEGIN screen_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END screen_task */
 }
 
 /* Private application code --------------------------------------------------*/
