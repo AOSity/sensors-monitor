@@ -22,7 +22,6 @@ Core/Src/main.c \
 Core/Src/gpio.c \
 Core/Src/freertos.c \
 Core/Src/usart.c \
-Core/Src/usb_otg.c \
 Core/Src/stm32f7xx_it.c \
 Core/Src/stm32f7xx_hal_msp.c \
 Core/Src/stm32f7xx_hal_timebase_tim.c \
@@ -46,7 +45,6 @@ Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart_ex.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd_ex.c \
-Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_usb.c \
 Core/Src/system_stm32f7xx.c \
 Middlewares/Third_Party/FreeRTOS/Source/croutine.c \
 Middlewares/Third_Party/FreeRTOS/Source/event_groups.c \

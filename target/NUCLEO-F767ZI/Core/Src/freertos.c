@@ -68,6 +68,13 @@ const osThreadAttr_t Screnn_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
+/* Definitions for SerialLogging */
+osThreadId_t SerialLoggingHandle;
+const osThreadAttr_t SerialLogging_attributes = {
+  .name = "SerialLogging",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -77,6 +84,7 @@ const osThreadAttr_t Screnn_attributes = {
 void startup_task(void *argument);
 void cli_task(void *argument);
 void screen_task(void *argument);
+void slog_print_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -115,6 +123,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of Screnn */
   ScrennHandle = osThreadNew(screen_task, NULL, &Screnn_attributes);
+
+  /* creation of SerialLogging */
+  SerialLoggingHandle = osThreadNew(slog_print_task, NULL, &SerialLogging_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -178,6 +189,24 @@ __weak void screen_task(void *argument)
     osDelay(1);
   }
   /* USER CODE END screen_task */
+}
+
+/* USER CODE BEGIN Header_slog_print_task */
+/**
+* @brief Function implementing the SerialLogging thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_slog_print_task */
+__weak void slog_print_task(void *argument)
+{
+  /* USER CODE BEGIN slog_print_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END slog_print_task */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -12,12 +12,12 @@
 static uint8_t rx_buffer[1] = { 0 };
 
 
-void cli_task(void* argument)
-{
+void cli_task(void* argument) {
     HAL_UART_Receive_IT(&slog_uart, rx_buffer, 1);
+    SLOG_DEBUG("cli_task started");
     for (;;) {
-        SLOG_INFO("cli working...");
-        osDelay(5000);
+        osDelay(10000);
+        SLOG_INFO("cli alive...");
     }
 }
 
