@@ -29,6 +29,7 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -49,31 +50,63 @@
 /* USER CODE END Variables */
 /* Definitions for Startup */
 osThreadId_t StartupHandle;
+uint32_t StartupBuffer[ 128 ];
+osStaticThreadDef_t StartupControlBlock;
 const osThreadAttr_t Startup_attributes = {
   .name = "Startup",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityHigh,
+  .cb_mem = &StartupControlBlock,
+  .cb_size = sizeof(StartupControlBlock),
+  .stack_mem = &StartupBuffer[0],
+  .stack_size = sizeof(StartupBuffer),
+  .priority = (osPriority_t) osPriorityRealtime7,
 };
 /* Definitions for CLI */
 osThreadId_t CLIHandle;
+uint32_t CLIBuffer[ 256 ];
+osStaticThreadDef_t CLIControlBlock;
 const osThreadAttr_t CLI_attributes = {
   .name = "CLI",
-  .stack_size = 128 * 4,
+  .cb_mem = &CLIControlBlock,
+  .cb_size = sizeof(CLIControlBlock),
+  .stack_mem = &CLIBuffer[0],
+  .stack_size = sizeof(CLIBuffer),
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for Screnn */
-osThreadId_t ScrennHandle;
-const osThreadAttr_t Screnn_attributes = {
-  .name = "Screnn",
-  .stack_size = 128 * 4,
+/* Definitions for Screen */
+osThreadId_t ScreenHandle;
+uint32_t ScreenBuffer[ 256 ];
+osStaticThreadDef_t ScreenControlBlock;
+const osThreadAttr_t Screen_attributes = {
+  .name = "Screen",
+  .cb_mem = &ScreenControlBlock,
+  .cb_size = sizeof(ScreenControlBlock),
+  .stack_mem = &ScreenBuffer[0],
+  .stack_size = sizeof(ScreenBuffer),
   .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for SerialLogging */
 osThreadId_t SerialLoggingHandle;
+uint32_t SerialLoggingBuffer[ 256 ];
+osStaticThreadDef_t SerialLoggingControlBlock;
 const osThreadAttr_t SerialLogging_attributes = {
   .name = "SerialLogging",
-  .stack_size = 128 * 4,
+  .cb_mem = &SerialLoggingControlBlock,
+  .cb_size = sizeof(SerialLoggingControlBlock),
+  .stack_mem = &SerialLoggingBuffer[0],
+  .stack_size = sizeof(SerialLoggingBuffer),
   .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Sensors */
+osThreadId_t SensorsHandle;
+uint32_t SensorsBuffer[ 256 ];
+osStaticThreadDef_t SensorsControlBlock;
+const osThreadAttr_t Sensors_attributes = {
+  .name = "Sensors",
+  .cb_mem = &SensorsControlBlock,
+  .cb_size = sizeof(SensorsControlBlock),
+  .stack_mem = &SensorsBuffer[0],
+  .stack_size = sizeof(SensorsBuffer),
+  .priority = (osPriority_t) osPriorityNormal,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,6 +118,7 @@ void startup_task(void *argument);
 void cli_task(void *argument);
 void screen_task(void *argument);
 void slog_print_task(void *argument);
+void sensors_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -121,11 +155,14 @@ void MX_FREERTOS_Init(void) {
   /* creation of CLI */
   CLIHandle = osThreadNew(cli_task, NULL, &CLI_attributes);
 
-  /* creation of Screnn */
-  ScrennHandle = osThreadNew(screen_task, NULL, &Screnn_attributes);
+  /* creation of Screen */
+  ScreenHandle = osThreadNew(screen_task, NULL, &Screen_attributes);
 
   /* creation of SerialLogging */
   SerialLoggingHandle = osThreadNew(slog_print_task, NULL, &SerialLogging_attributes);
+
+  /* creation of Sensors */
+  SensorsHandle = osThreadNew(sensors_task, NULL, &Sensors_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -207,6 +244,24 @@ __weak void slog_print_task(void *argument)
     osDelay(1);
   }
   /* USER CODE END slog_print_task */
+}
+
+/* USER CODE BEGIN Header_sensors_task */
+/**
+* @brief Function implementing the Sensors thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_sensors_task */
+__weak void sensors_task(void *argument)
+{
+  /* USER CODE BEGIN sensors_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END sensors_task */
 }
 
 /* Private application code --------------------------------------------------*/
