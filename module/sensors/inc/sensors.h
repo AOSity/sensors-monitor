@@ -21,3 +21,4 @@ typedef enum {
 } sensor_data_type_t;
 
 void ags02ma_process_reading(void);
+void bmp280_process_reading(void);
