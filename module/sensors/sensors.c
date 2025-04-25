@@ -19,6 +19,7 @@ typedef struct {
 
 sensor_map_entry_t sensors_map[] = {
     {0x1A, ags02ma_process_reading},
+    {0x38, aht20_process_reading},
     {0x77, bmp280_process_reading},
     /** add new sensors here */
 };

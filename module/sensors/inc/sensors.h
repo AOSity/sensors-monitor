@@ -22,3 +22,4 @@ typedef enum {
 
 void ags02ma_process_reading(void);
 void bmp280_process_reading(void);
+void aht20_process_reading(void);
