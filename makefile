@@ -5,6 +5,7 @@ DEBUG = 1
 OPT = -Og
 
 PREFIX = arm-none-eabi-
+
 # The gcc compiler bin path can be either defined in make command via GCC_PATH variable (> make GCC_PATH=xxx)
 # either it can be added to the PATH environment variable.
 ifdef GCC_PATH
@@ -18,14 +19,17 @@ AS = $(PREFIX)gcc -x assembler-with-cpp
 CP = $(PREFIX)objcopy
 SZ = $(PREFIX)size
 endif
+
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 OPENOCD = openocd
 
+# Collect sources and headers
 C_INC = $(wildcard module/*/inc)
 C_SRC = $(wildcard module/*/*.c)
 ASM_SRC =
 
+# Include target-specific files
 include target/$(TARGET)/specific.mk
 
 CFLAGS += $(MCU) $(C_DEFS) $(addprefix -I, $(C_INC)) $(OPT) -Wall -fdata-sections -ffunction-sections
@@ -34,49 +38,55 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
 endif
 
-# Generate dependency information
-CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
+CFLAGS += -MMD -MP
 
-# libraries
-LIBS = -lc -lm -lnosys 
-LIBDIR = 
+# Linker
+LIBS = -lc -lm -lnosys
+LIBDIR =
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
-# default action: build all
+# Source to Object mapping
+OBJECTS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(C_SRC))
+OBJECTS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(ASM_SRC))
+
+# Default target
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
 
-# list of objects
-OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SRC:.c=.o)))
-vpath %.c $(sort $(dir $(C_SRC)))
-# list of ASM program objects
-OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SRC:.s=.o)))
-vpath %.s $(sort $(dir $(ASM_SRC)))
+# Compile C
+$(BUILD_DIR)/%.o: %.c makefile
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(basename $@).lst $< -o $@
 
-$(BUILD_DIR)/%.o: %.c makefile | $(BUILD_DIR) 
-	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
-
-$(BUILD_DIR)/%.o: %.s makefile | $(BUILD_DIR)
-	$(AS) -c $(CFLAGS) $< -o $@
-$(BUILD_DIR)/%.o: %.S makefile | $(BUILD_DIR)
+# Compile assembly (.s)
+$(BUILD_DIR)/%.o: %.s makefile
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(AS) -c $(CFLAGS) $< -o $@
 
+# Compile assembly (.S)
+$(BUILD_DIR)/%.o: %.S makefile
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(AS) -c $(CFLAGS) $< -o $@
+
+# Link ELF
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) makefile
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	$(SZ) $@
 
-$(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+# Generate HEX and BIN
+$(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf
 	$(HEX) $< $@
-	
-$(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
-	$(BIN) $< $@
-	
-$(BUILD_DIR):
-	mkdir $@
 
+$(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf
+	$(BIN) $< $@
+
+# Flash target
 flash: $(BUILD_DIR)/$(TARGET).elf
 	$(OPENOCD) -f interface/stlink.cfg -f target/$(TARGET_FAMILY).cfg -c "program $< verify reset exit"
 
+# Clean
 clean:
-	@if exist $(BUILD_DIR) (rmdir /S /Q $(BUILD_DIR))
+	@if exist "$(BUILD_DIR)" rmdir /S /Q "$(BUILD_DIR)"
 
--include $(wildcard $(BUILD_DIR)/*.d)
+# Auto-include dependency files
+-include $(OBJECTS:.o=.d)
