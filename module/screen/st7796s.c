@@ -56,7 +56,7 @@ static void st7796s_init(void) {
     send_data(0x55); // Interface Pixel Format = 16 bit
 
     send_cmd(0x36); 
-    send_data(0x00); // Memory Access Control
+    send_data(0xE8); // Memory Access Control
 
     send_cmd(0x29); // Display ON
     osDelay(10);
@@ -89,12 +89,19 @@ static void wait_dma_ready(void) {
 }
 
 static void st7796s_send_pixels(const uint16_t* data, size_t size) {
-    wait_dma_ready();
-    dma_done = false;
+    size_t remaining = size * 2;
+    uint8_t* buf8 = (uint8_t*)data;
 
     DC_Data();
     CS_Enable();
-    HAL_SPI_Transmit_DMA(&screen_spi, (uint8_t*)data, size * 2);
-    wait_dma_ready();
+    while (remaining > 0) {
+        size_t chunk = (remaining > UINT16_MAX) ? UINT16_MAX : remaining;
+        wait_dma_ready();
+        dma_done = false;
+        HAL_SPI_Transmit_DMA(&screen_spi, (uint8_t*)buf8, chunk);
+        wait_dma_ready();
+        buf8 += chunk;
+        remaining -= chunk;
+    }
     CS_Disable();
 }

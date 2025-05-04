@@ -74,7 +74,7 @@ const osThreadAttr_t CLI_attributes = {
 };
 /* Definitions for Screen */
 osThreadId_t ScreenHandle;
-uint32_t ScreenBuffer[ 256 ];
+uint32_t ScreenBuffer[ 1024 ];
 osStaticThreadDef_t ScreenControlBlock;
 const osThreadAttr_t Screen_attributes = {
   .name = "Screen",
@@ -82,7 +82,7 @@ const osThreadAttr_t Screen_attributes = {
   .cb_size = sizeof(ScreenControlBlock),
   .stack_mem = &ScreenBuffer[0],
   .stack_size = sizeof(ScreenBuffer),
-  .priority = (osPriority_t) osPriorityHigh,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for SerialLogging */
 osThreadId_t SerialLoggingHandle;
