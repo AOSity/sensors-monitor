@@ -32,6 +32,11 @@ ASM_SRC =
 # Include target-specific files
 include target/$(TARGET)/specific.mk
 
+# Include third-party lib files
+LVGL_PATH = third-party/lvgl
+C_INC += $(LVGL_PATH)
+C_SRC += $(shell find $(LVGL_PATH)/src -type f -name '*.c')
+
 CFLAGS += $(MCU) $(C_DEFS) $(addprefix -I, $(C_INC)) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 ifeq ($(DEBUG), 1)
@@ -54,22 +59,22 @@ all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET
 
 # Compile C
 $(BUILD_DIR)/%.o: %.c makefile
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	@mkdir -p $(dir $@)
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(basename $@).lst $< -o $@
 
 # Compile assembly (.s)
 $(BUILD_DIR)/%.o: %.s makefile
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	@mkdir -p $(dir $@)
 	$(AS) -c $(CFLAGS) $< -o $@
 
 # Compile assembly (.S)
 $(BUILD_DIR)/%.o: %.S makefile
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	@mkdir -p $(dir $@)
 	$(AS) -c $(CFLAGS) $< -o $@
 
 # Link ELF
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) makefile
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	@mkdir -p $(dir $@)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	$(SZ) $@
 
@@ -86,7 +91,7 @@ flash: $(BUILD_DIR)/$(TARGET).elf
 
 # Clean
 clean:
-	@if exist "$(BUILD_DIR)" rmdir /S /Q "$(BUILD_DIR)"
+	rm -rf $(BUILD_DIR)
 
 # Auto-include dependency files
 -include $(OBJECTS:.o=.d)
