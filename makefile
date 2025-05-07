@@ -25,9 +25,9 @@ BIN = $(CP) -O binary -S
 OPENOCD = openocd
 
 # Collect sources and headers
-C_INC = $(wildcard module/*/inc)
-C_SRC = $(wildcard module/*/*.c)
-ASM_SRC =
+C_INC += $(wildcard module/*/inc)
+C_SRC += $(wildcard module/*/*.c)
+C_SRC += $(wildcard module/*/*/*.c)
 
 # Include target-specific files
 include target/$(TARGET)/specific.mk
