@@ -23,3 +23,8 @@ extern screen_driver_t screen;
  * @note Shall be implemented in you screen IC driver source file
  */
 void screen_init_driver(void);
+
+/**
+ * @brief Called when screen data transmit complete
+ */
+void screen_tx_complete_handler(void);
