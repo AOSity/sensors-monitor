@@ -22,16 +22,12 @@ static volatile uint16_t log_tail = 0;
 static volatile bool dma_ready = true;
 
 /**
- * @brief Handle transmit complete to update buffer tail and dma ready flag 
- * 
- * @param huart uart handle
+ * @brief Handle transmit complete to update buffer tail and dma ready flag
  */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
-    if (huart == &slog_uart) {
-        uint16_t len = (log_head >= log_tail) ? log_head - log_tail : LOG_BUFFER_SIZE - log_tail;
-        log_tail = (log_tail + len) % LOG_BUFFER_SIZE;
-        dma_ready = true;
-    }
+void slot_tx_complete_handler(void) {
+    uint16_t len = (log_head >= log_tail) ? log_head - log_tail : LOG_BUFFER_SIZE - log_tail;
+    log_tail = (log_tail + len) % LOG_BUFFER_SIZE;
+    dma_ready = true;
 }
 
 /**

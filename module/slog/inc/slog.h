@@ -22,3 +22,4 @@ typedef enum {
 } slog_level_t;
 
 void slog_write(slog_level_t level, const char* format, ...);
+void slot_tx_complete_handler(void);

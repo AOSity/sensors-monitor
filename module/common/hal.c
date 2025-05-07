@@ -7,10 +7,11 @@
 
 #include "indev.h"
 #include "screen.h"
+#include "slog.h"
 #include "main.h"
 #include "gpio.h"
 #include "spi.h"
-#include "i2c.h"
+#include "usart.h"
 
 /**
  * @brief Interrupt requests handler
@@ -29,5 +30,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef* hspi) {
     if (hspi == &screen_spi) {
         screen_tx_complete_handler();
+    }
+}
+
+/**
+ * @brief UART transmit complete handler
+ *
+ * @param huart UART handle
+ */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
+    if (huart == &slog_uart) {
+        slot_tx_complete_handler();
     }
 }
