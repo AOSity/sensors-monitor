@@ -60,8 +60,8 @@ static void ft6336u_read_touch(void) {
         uint8_t data[4];
         HAL_I2C_Mem_Read(&touch_i2c, FT6336U_ADDR, FT6336U_REG_P1_XH, 1, data, 4, HAL_MAX_DELAY);
         indev.touch.touched = true;
-        indev.touch.x = ((data[0] & 0x0F) << 8) | data[1];
-        indev.touch.y = ((data[2] & 0x0F) << 8) | data[3];
+        indev.touch.x = 480 - (((data[2] & 0x0F) << 8) | data[3]);
+        indev.touch.y = ((data[0] & 0x0F) << 8) | data[1];
     } else {
         indev.touch.touched = false;
     }
