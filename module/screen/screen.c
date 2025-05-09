@@ -5,6 +5,7 @@
  * @author Andrii Horbul (andreyhorbggwp@gmail.com)
  */
 
+#include "indev.h"
 #include "screen.h"
 #include "slog.h"
 #include "main.h"
@@ -17,6 +18,8 @@ extern screen_driver_t screen;
 
 static uint8_t buf1[UINT16_MAX];
 static uint8_t buf2[UINT16_MAX];
+
+extern indev_t indev;
 
 /**
  * @brief Callback used to send rendered data to screen
@@ -44,6 +47,8 @@ void screen_task(void* argument) {
     SLOG_DEBUG("screen_task init screen");
     osDelay(150);
     HAL_GPIO_WritePin(LCD_LED_GPIO_Port, LCD_LED_Pin, GPIO_PIN_SET);
+    SLOG_DEBUG("screen_task init input device");
+    indev_init();
 
     lv_init();
     lv_tick_set_cb(osKernelGetTickCount);
