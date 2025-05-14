@@ -20,6 +20,8 @@ typedef enum {
     SENSOR_TYPE_COUNT,
 } sensor_data_type_t;
 
-void ags02ma_process_reading(void);
-void bmp280_process_reading(void);
-void aht20_process_reading(void);
+typedef void (*sensor_reading_handler_t)(sensor_data_type_t, int32_t);
+
+void ags02ma_process_reading(sensor_reading_handler_t);
+void bmp280_process_reading(sensor_reading_handler_t);
+void aht20_process_reading(sensor_reading_handler_t);

@@ -35,9 +35,9 @@ static uint8_t calc_crc8(const uint8_t* data, uint8_t size) {
     return crc;
 }
 
-void aht20_process_reading(void) {
+void aht20_process_reading(sensor_reading_handler_t reading_handler) {
     uint8_t rx_buffer[7];
-    uint8_t cmd[3] = { AGS02MA_CMD_GET_READING, 0x33, 0x00 };
+    uint8_t cmd[3] = {AGS02MA_CMD_GET_READING, 0x33, 0x00};
 
     if (HAL_I2C_Master_Transmit(&sens_i2c, AHT20_ADDR, cmd, 3, HAL_MAX_DELAY) != HAL_OK) {
         SLOG_ERROR("AHT20 data request failed");
@@ -63,8 +63,13 @@ void aht20_process_reading(void) {
 
     uint32_t raw_hum = ((uint32_t)(rx_buffer[1]) << 12) | ((uint32_t)(rx_buffer[2]) << 4) | (rx_buffer[3] >> 4);
     uint32_t raw_temp = (((uint32_t)(rx_buffer[3] & 0x0F)) << 16) | ((uint32_t)(rx_buffer[4]) << 8) | rx_buffer[5];
-    uint32_t humidity = (raw_hum * 1000) / 1048576;
-    int32_t temperature = ((int32_t)raw_temp * 2000 / 1048576) - 500;
+    uint32_t humidity = (raw_hum * 1000) / 1048576 * 10;
+    int32_t temperature = (((int32_t)raw_temp * 2000 / 1048576) - 500) * 10;
 
-    SLOG_DEBUG("AHT20: Temperature = %d.%02d °C, Humidity = %u.%02u %%", temperature / 10, temperature % 10, humidity / 10, humidity % 10);
+    SLOG_DEBUG("AHT20: Temperature = %d.%02d °C, Humidity = %u.%02u %%", temperature / 100, temperature % 100, humidity / 100, humidity % 100);
+
+    if (reading_handler) {
+        (*reading_handler)(SENSOR_TEMPERATURE, (int32_t)temperature);
+        (*reading_handler)(SENSOR_HUMIDITY, (int32_t)humidity);
+    }
 }

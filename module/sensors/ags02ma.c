@@ -35,7 +35,7 @@ static uint8_t calc_crc8(const uint8_t* data, uint8_t size) {
     return crc;
 }
 
-void ags02ma_process_reading(void) {
+void ags02ma_process_reading(sensor_reading_handler_t reading_handler) {
     uint8_t rx_buffer[5];
     uint8_t cmd = AGS02MA_CMD_GET_READING;
 

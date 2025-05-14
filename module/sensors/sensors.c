@@ -10,7 +10,7 @@
 #include "i2c.h"
 #include "cmsis_os2.h"
 
-typedef void (*process_reading_func_t)(void);
+typedef void (*process_reading_func_t)(sensor_reading_handler_t);
 
 typedef struct {
     uint8_t sensor_addr;
@@ -29,7 +29,7 @@ const int sensors_count = sizeof(sensors_map) / sizeof(sensor_map_entry_t);
 static void process_reading_by_sensor_addr(uint8_t addr) {
     for (int i = 0; i < sensors_count; i++) {
         if (sensors_map[i].sensor_addr == addr) {
-            sensors_map[i].process_reading();
+            sensors_map[i].process_reading(NULL);
             return;
         }
     }

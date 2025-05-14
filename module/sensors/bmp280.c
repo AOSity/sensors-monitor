@@ -90,7 +90,7 @@ static uint32_t bmp280_compensate_pressure(int32_t adc_p) {
     return (uint32_t)(p >> 8);
 }
 
-void bmp280_process_reading(void) {
+void bmp280_process_reading(sensor_reading_handler_t reading_handler) {
     uint8_t id;
     if (bmp280_read_bytes(BMP280_REG_ID, &id, 1) != HAL_OK || id != 0x58) {
         SLOG_ERROR("BMP280 not found or wrong ID: 0x%02X", id);
@@ -112,8 +112,13 @@ void bmp280_process_reading(void) {
 
     int32_t adc_t = (int32_t)(((uint32_t)data[3] << 12) | ((uint32_t)data[4] << 4) | (data[5] >> 4));
     int32_t adc_p = (int32_t)(((uint32_t)data[0] << 12) | ((uint32_t)data[1] << 4) | (data[2] >> 4));
-    int32_t temp = bmp280_compensate_temperature(adc_t);
-    uint32_t press = bmp280_compensate_pressure(adc_p);
+    int32_t temperature = bmp280_compensate_temperature(adc_t);
+    uint32_t pressure = bmp280_compensate_pressure(adc_p);
 
-    SLOG_DEBUG("BMP280: Temperature = %d.%02d °C, Pressure = %lu Pa", temp / 100, temp % 100, press);
+    SLOG_DEBUG("BMP280: Temperature = %d.%02d °C, Pressure = %lu hPa", temperature / 100, temperature % 100, pressure / 100);
+
+    if (reading_handler) {
+        (*reading_handler)(SENSOR_TEMPERATURE, (int32_t)temperature);
+        (*reading_handler)(SENSOR_PRESSURE, (int32_t)pressure);
+    }
 }
