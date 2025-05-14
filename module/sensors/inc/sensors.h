@@ -13,11 +13,11 @@
   * @brief Sensors measurements data types
   */
 typedef enum {
-    SENSOR_UNKNOWN = 0,
     SENSOR_TEMPERATURE,
     SENSOR_HUMIDITY,
     SENSOR_PRESSURE,
     SENSOR_TVOC,
+    SENSOR_TYPE_COUNT,
 } sensor_data_type_t;
 
 void ags02ma_process_reading(void);

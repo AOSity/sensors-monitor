@@ -7,6 +7,7 @@
 
 #include "indev.h"
 #include "screen.h"
+#include "gui.h"
 #include "slog.h"
 #include "main.h"
 #include "cmsis_os2.h"
@@ -90,6 +91,7 @@ void screen_task(void* argument) {
     }
     lv_indev_set_read_cb(input, lv_input_read);
 
+    gui_sensmon_create_screen(lv_scr_act());
     for (;;) {
         lv_timer_handler();
         osDelay(5);
