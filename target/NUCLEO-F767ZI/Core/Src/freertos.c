@@ -96,6 +96,18 @@ const osThreadAttr_t SerialLogging_attributes = {
   .stack_size = sizeof(SerialLoggingBuffer),
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Archivist */
+osThreadId_t ArchivistHandle;
+uint32_t ArchivistBuffer[ 1024 ];
+osStaticThreadDef_t ArchivistControlBlock;
+const osThreadAttr_t Archivist_attributes = {
+  .name = "Archivist",
+  .cb_mem = &ArchivistControlBlock,
+  .cb_size = sizeof(ArchivistControlBlock),
+  .stack_mem = &ArchivistBuffer[0],
+  .stack_size = sizeof(ArchivistBuffer),
+  .priority = (osPriority_t) osPriorityNormal,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -106,6 +118,7 @@ void startup_task(void *argument);
 void cli_task(void *argument);
 void screen_task(void *argument);
 void slog_print_task(void *argument);
+void archivist_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -147,6 +160,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of SerialLogging */
   SerialLoggingHandle = osThreadNew(slog_print_task, NULL, &SerialLogging_attributes);
+
+  /* creation of Archivist */
+  ArchivistHandle = osThreadNew(archivist_task, NULL, &Archivist_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -228,6 +244,24 @@ __weak void slog_print_task(void *argument)
     osDelay(1);
   }
   /* USER CODE END slog_print_task */
+}
+
+/* USER CODE BEGIN Header_archivist_task */
+/**
+* @brief Function implementing the Archivist thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_archivist_task */
+__weak void archivist_task(void *argument)
+{
+  /* USER CODE BEGIN archivist_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END archivist_task */
 }
 
 /* Private application code --------------------------------------------------*/

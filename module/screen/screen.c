@@ -93,7 +93,6 @@ void screen_task(void* argument) {
 
     gui_sensmon_create_screen(lv_scr_act());
     for (;;) {
-        lv_timer_handler();
         osDelay(5);
     }
 }
