@@ -22,6 +22,13 @@ typedef enum {
 
 typedef void (*sensor_reading_handler_t)(sensor_data_type_t, int32_t);
 
+/**
+ * @brief Scanes sensor i2c bus and processes readings of supported ones
+ *
+ * @param reading_handler handler for received readings
+ */
+void sensor_process_reading(sensor_reading_handler_t reading_handler);
+
 void ags02ma_process_reading(sensor_reading_handler_t);
 void bmp280_process_reading(sensor_reading_handler_t);
 void aht20_process_reading(sensor_reading_handler_t);

@@ -96,18 +96,6 @@ const osThreadAttr_t SerialLogging_attributes = {
   .stack_size = sizeof(SerialLoggingBuffer),
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for Sensors */
-osThreadId_t SensorsHandle;
-uint32_t SensorsBuffer[ 256 ];
-osStaticThreadDef_t SensorsControlBlock;
-const osThreadAttr_t Sensors_attributes = {
-  .name = "Sensors",
-  .cb_mem = &SensorsControlBlock,
-  .cb_size = sizeof(SensorsControlBlock),
-  .stack_mem = &SensorsBuffer[0],
-  .stack_size = sizeof(SensorsBuffer),
-  .priority = (osPriority_t) osPriorityNormal,
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -118,7 +106,6 @@ void startup_task(void *argument);
 void cli_task(void *argument);
 void screen_task(void *argument);
 void slog_print_task(void *argument);
-void sensors_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -160,9 +147,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of SerialLogging */
   SerialLoggingHandle = osThreadNew(slog_print_task, NULL, &SerialLogging_attributes);
-
-  /* creation of Sensors */
-  SensorsHandle = osThreadNew(sensors_task, NULL, &Sensors_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -244,24 +228,6 @@ __weak void slog_print_task(void *argument)
     osDelay(1);
   }
   /* USER CODE END slog_print_task */
-}
-
-/* USER CODE BEGIN Header_sensors_task */
-/**
-* @brief Function implementing the Sensors thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_sensors_task */
-__weak void sensors_task(void *argument)
-{
-  /* USER CODE BEGIN sensors_task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END sensors_task */
 }
 
 /* Private application code --------------------------------------------------*/

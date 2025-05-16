@@ -56,6 +56,9 @@ void ags02ma_process_reading(sensor_reading_handler_t reading_handler) {
         return;
     }
 
-    uint32_t raw_value = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | rx_buffer[3];
-    SLOG_DEBUG("AGS02MA: TVOC = %lu ppb", raw_value);
+    uint32_t tvoc = (rx_buffer[1] << 16) | (rx_buffer[2] << 8) | rx_buffer[3];
+    SLOG_DEBUG("AGS02MA: TVOC = %lu ppb", tvoc);
+    if (reading_handler) {
+        (*reading_handler)(SENSOR_TVOC, (int32_t)tvoc);
+    }
 }
