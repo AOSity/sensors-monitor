@@ -59,8 +59,9 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define sens_i2c hi2c2
 #define slog_uart huart3
-#define screen_spi hspi1
 #define touch_i2c hi2c4
+#define screen_spi hspi1
+#define memory_spi hspi5
 #define USER_Btn_Pin GPIO_PIN_13
 #define USER_Btn_GPIO_Port GPIOC
 #define USER_Btn_EXTI_IRQn EXTI15_10_IRQn
@@ -78,6 +79,8 @@ void Error_Handler(void);
 #define RMII_RXD1_GPIO_Port GPIOC
 #define LD1_Pin GPIO_PIN_0
 #define LD1_GPIO_Port GPIOB
+#define FLSH_CS_Pin GPIO_PIN_1
+#define FLSH_CS_GPIO_Port GPIOG
 #define TCH_RST_Pin GPIO_PIN_13
 #define TCH_RST_GPIO_Port GPIOE
 #define LCD_DC_Pin GPIO_PIN_12
