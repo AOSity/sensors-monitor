@@ -7,6 +7,7 @@
 
 #include "indev.h"
 #include "screen.h"
+#include "memory.h"
 #include "slog.h"
 #include "main.h"
 #include "gpio.h"
@@ -30,6 +31,20 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef* hspi) {
     if (hspi == &screen_spi) {
         screen_tx_complete_handler();
+    }
+    if (hspi == &memory_spi) {
+        memory_tx_complete_handler();
+    }
+}
+
+/**
+ * @brief SPI receive complete handler
+ *
+ * @param hspi SPI handle
+ */
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef* hspi) {
+    if (hspi == &memory_spi) {
+        memory_rx_complete_handler();
     }
 }
 
