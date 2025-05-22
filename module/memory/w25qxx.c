@@ -146,6 +146,7 @@ void memory_init_driver(void) {
     memory.erase_sector = w25qxx_erase_sector;
     memory.erase_chip = w25qxx_erase_chip;
     memory.get_id = w25qxx_get_id;
+    memory.sector_size = W25QXX_SECTOR_SIZE;
 }
 
 void memory_tx_complete_handler(void) {

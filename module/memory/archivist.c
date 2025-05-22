@@ -9,12 +9,14 @@
 #include "memory.h"
 #include "gui.h"
 #include "slog.h"
+#include "rtc.h"
+#include "datetime.h"
 #include "cmsis_os2.h"
 #include <stdbool.h>
 
 #define SENSOR_READ_VALUE_PERIOD_S 60
 #define CHART_PUSH_VALUE_PERIOD_S  300
-#define MEMORY_SAVE_VALUE_PERIOD_S 900
+#define MEMORY_SAVE_VALUE_PERIOD_S 1200
 
 static volatile bool need_sensor_read = true;
 static volatile bool need_chart_push = true;
@@ -23,6 +25,7 @@ static volatile bool need_memory_save = false;
 static int32_t last_data[SENSOR_TYPE_COUNT] = {0};
 static int32_t chart_push_data[SENSOR_TYPE_COUNT] = {0};
 static int32_t memory_save_data[SENSOR_TYPE_COUNT] = {0};
+static int32_t memory_save_addr[SENSOR_TYPE_COUNT] = {0};
 extern memory_driver_t memory;
 
 static void reading_handler(sensor_data_type_t type, int32_t value) {
@@ -49,6 +52,46 @@ static void memory_save_periodic_cb(void* argument) {
     need_memory_save = true;
 }
 
+static void memory_scan(void) {
+    for (uint8_t type = 0; type < SENSOR_TYPE_COUNT; type++) {
+        /* Reserve 2 sectors for each sensor reading type */
+        const uint32_t start_addr = type * memory.sector_size * 2;
+        for (uint32_t addr = start_addr; addr < start_addr + memory.sector_size * 2; addr += sizeof(memory_entry_t)) {
+            memory_entry_t entry = {0};
+            memory.read(entry.raw, addr, sizeof(entry));
+            if (entry.value == 0xFFFFFFFF) {
+                memory_save_addr[type] = addr;
+                SLOG_DEBUG("sensor type %u, addr to write 0x%06X", type, addr);
+                break;
+            }
+        }
+    }
+}
+
+static void memory_save(void) {
+    RTC_DateTypeDef date;
+    RTC_TimeTypeDef time;
+    HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BCD);
+    HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BCD);
+    uint32_t timestamp = datetime_to_timestamp(2000 + date.Year, date.Month, date.Date, time.Hours, time.Minutes, 0);
+    SLOG_DEBUG("sensor data save with timestamp %lu", timestamp);
+
+    for (uint8_t type = 0; type < SENSOR_TYPE_COUNT; type++) {
+        const uint32_t start_addr = type * memory.sector_size * 2;
+        if (memory_save_addr[type] % memory.sector_size == 0) {
+            memory.erase_sector(memory_save_addr[type]);
+        }
+
+        memory_entry_t entry;
+        entry.timestamp = timestamp;
+        entry.value = memory_save_data[type];
+        memory.write(entry.raw, memory_save_addr[type], sizeof(entry));
+        SLOG_DEBUG("sensor type %u value saved at 0x%06X", type, memory_save_addr[type]);
+        memory_save_addr[type] += sizeof(memory_entry_t);
+        memory_save_addr[type] = start_addr + (memory_save_addr[type] - start_addr) % (memory.sector_size * 2);
+    }
+}
+
 
 void archivist_task(void* argument) {
     osDelay(200);
@@ -57,6 +100,8 @@ void archivist_task(void* argument) {
     memory_init_driver();
     memory.init();
     SLOG_DEBUG("memory id: 0x%06X", memory.get_id());
+
+    memory_scan();
 
     while (!gui_sensmon_screen_ready()) {
         gui_process();
@@ -96,7 +141,7 @@ void archivist_task(void* argument) {
         }
         if (need_memory_save) {
             need_memory_save = false;
-            SLOG_DEBUG("periodic data save to memory");
+            memory_save();
         }
         gui_process();
         osDelay(5);
