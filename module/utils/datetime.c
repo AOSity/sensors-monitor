@@ -1,0 +1,43 @@
+/**
+ * @file datetime.c
+ * @brief Functions to work with datetime
+ *
+ * @author Andrii Horbul (andreyhorbggwp@gmail.com)
+ */
+
+#include "datetime.h"
+#include <stdbool.h>
+
+const int days_in_month[] = {
+    31, 28, 31, 30, 31, 30,
+    31, 31, 30, 31, 30, 31
+};
+
+static bool is_leap_year(int year) {
+    return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
+}
+
+uint32_t datetime_to_timestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec) {
+    uint32_t days = 0;
+
+    /* Add days for previous years */
+    for (int y = 1970; y < year; y++) {
+        days += is_leap_year(y) ? 366 : 365;
+    }
+
+    /* Add days for previous months in current year */
+    for (int m = 1; m < month; m++) {
+        days += days_in_month[m - 1];
+        if (m == 2 && is_leap_year(year)) {
+            days += 1;
+        }
+    }
+
+    /* Add days in current month */
+    days += (day - 1);
+
+    /* Convert datetime to seconds */
+    uint32_t timestamp = days * 86400 + hour * 3600 + min * 60 + sec;
+
+    return timestamp;
+}
