@@ -17,7 +17,6 @@ void cli_task(void* argument) {
     SLOG_DEBUG("cli_task started");
     for (;;) {
         osDelay(10000);
-        SLOG_INFO("cli alive...");
     }
 }
 

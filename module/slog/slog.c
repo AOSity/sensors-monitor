@@ -17,6 +17,7 @@
 #define LOG_MESSAGE_SIZE 128
 
 static uint8_t log_buffer[LOG_BUFFER_SIZE];
+static osMutexId_t log_mutex;
 static volatile uint16_t log_head = 0;
 static volatile uint16_t log_tail = 0;
 static volatile bool dma_ready = true;
@@ -38,6 +39,10 @@ void slot_tx_complete_handler(void) {
  * @param ...  argv
  */
 void slog_write(slog_level_t level, const char* format, ...) {
+    if (osMutexAcquire(log_mutex, 100) != osOK) {
+        return;
+    }
+
     char msg[LOG_MESSAGE_SIZE];
     int offset = 0;
 
@@ -72,12 +77,21 @@ void slog_write(slog_level_t level, const char* format, ...) {
         log_buffer[log_head] = msg[i];
         log_head = next;
     }
+    osMutexRelease(log_mutex);
 }
 
 /**
  * @brief Periodically transmits logs buffer via slog_uart
  */
 void slog_print_task(void* unused) {
+    log_mutex = osMutexNew(NULL);
+
+    slog_write(0, " __  __         _       _             _   ___  ___ ___ _______   __");
+    slog_write(0, "|  \\/  |__ _ __| |___  | |__ _  _    /_\\ / _ \\/ __|_ _|_   _\\ \\ / /");
+    slog_write(0, "| |\\/| / _` / _` / -_) | '_ \\ || |  / _ \\ (_) \\__ \\| |  | |  \\ V / ");
+    slog_write(0, "|_|  |_\\__,_\\__,_\\___| |_.__/\\_, | /_/ \\_\\___/|___/___| |_|   |_|  ");
+    slog_write(0, "                             |__/                                  ");
+
     SLOG_DEBUG("slog_print_task started");
     for (;;) {
         if (dma_ready && log_head != log_tail) {
