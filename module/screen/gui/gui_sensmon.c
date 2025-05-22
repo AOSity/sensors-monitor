@@ -163,6 +163,11 @@ void gui_sensmon_update_current_value(sensor_data_type_t type, int32_t value) {
         default:
             return;
     }
+
+    if (value == LV_CHART_POINT_NONE) {
+        snprintf(new_value, sizeof(new_value), "--");
+    }
+    
     lv_label_set_text(sc->curr_value, new_value);
 }
 
