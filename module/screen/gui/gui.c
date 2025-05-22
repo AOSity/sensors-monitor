@@ -85,6 +85,8 @@ void gui_init(void) {
     }
     lv_indev_set_read_cb(input, lv_input_read);
     SLOG_DEBUG("gui init lvgl");
+
+    gui_datetime_screen_init(lv_scr_act());
 }
 
 void gui_process(void) {

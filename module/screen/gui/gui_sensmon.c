@@ -8,6 +8,8 @@
 #include "gui.h"
 #include <stdio.h>
 
+static volatile bool is_screen_initialized = false;
+
 typedef struct {
     lv_obj_t* container;
     lv_obj_t* label_container;
@@ -25,7 +27,7 @@ static lv_obj_t* title_label;
 static sensor_chart_t charts[SENSOR_MONITOR_MAX_CHARTS];
 static uint8_t chart_count = 0;
 
-void gui_sensmon_create_screen(lv_obj_t* parent) {
+void gui_sensmon_screen_init(lv_obj_t* parent) {
     main_container = lv_obj_create(parent);
     lv_obj_set_size(main_container, 480, 320);
     lv_obj_center(main_container);
@@ -38,10 +40,25 @@ void gui_sensmon_create_screen(lv_obj_t* parent) {
     lv_label_set_text(title_label, "Sensors Monitor");
     lv_obj_set_style_text_font(title_label, &lv_font_montserrat_14, 0);
     lv_obj_align(title_label, LV_ALIGN_TOP_LEFT, 4, 4);
+    is_screen_initialized = true;
 }
 
+void gui_sensmon_screen_deinit(void) {
+    is_screen_initialized = false;
+    lv_obj_del(main_container);
+    main_container = NULL;
+    title_label = NULL;
+    lv_memset(charts, 0, sizeof(charts));
+    chart_count = 0;
+}
+
+bool gui_sensmon_screen_ready(void) {
+    return is_screen_initialized;
+}
+
+
 void gui_sensmon_create_chart(sensor_data_type_t type) {
-    if (type >= SENSOR_MONITOR_MAX_CHARTS || charts[type].initialized) {
+    if (type >= SENSOR_MONITOR_MAX_CHARTS || charts[type].initialized || !is_screen_initialized) {
         return;
     }
 
@@ -118,8 +135,12 @@ void gui_sensmon_create_chart(sensor_data_type_t type) {
 }
 
 void gui_sensmon_update_current_value(sensor_data_type_t type, int32_t value) {
-    if (type >= SENSOR_TYPE_COUNT || !charts[type].initialized) {
+    if (type >= SENSOR_TYPE_COUNT || !is_screen_initialized) {
         return;
+    }
+
+    if (!charts[type].initialized) {
+        gui_sensmon_create_chart(type);
     }
 
     sensor_chart_t* sc = &charts[type];
@@ -146,7 +167,7 @@ void gui_sensmon_update_current_value(sensor_data_type_t type, int32_t value) {
 }
 
 void gui_sensmon_push_chart_value(sensor_data_type_t type, int32_t value) {
-    if (type >= SENSOR_TYPE_COUNT) {
+    if (type >= SENSOR_TYPE_COUNT || !is_screen_initialized) {
         return;
     }
 
