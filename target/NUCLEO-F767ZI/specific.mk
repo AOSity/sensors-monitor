@@ -62,7 +62,10 @@ Core/Src/spi.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.c \
 Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi_ex.c \
 Core/Src/dma.c \
-Core/Src/i2c.c
+Core/Src/i2c.c \
+Core/Src/rtc.c \
+Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rtc.c \
+Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rtc_ex.c
 C_SRC += $(addprefix target/$(TARGET)/, $(C_SOURCES))
 
 ASM_SOURCES =  \
