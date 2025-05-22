@@ -25,6 +25,8 @@ static void reading_handler(sensor_data_type_t type, int32_t value) {
 
 void archivist_task(void* argument) {
     osDelay(500);
+    gui_init();
+    gui_sensmon_create_screen(lv_scr_act());
 
     memory_init_driver();
     memory.init();

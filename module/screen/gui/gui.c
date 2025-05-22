@@ -1,25 +1,22 @@
 /**
- * @file screen.c
- * @brief Contains task for screen initialization and graphics
+ * @file gui.c
+ * @brief Graphical user interface functions
  *
  * @author Andrii Horbul (andreyhorbggwp@gmail.com)
  */
 
-#include "indev.h"
-#include "screen.h"
 #include "gui.h"
+#include "screen.h"
+#include "indev.h"
 #include "slog.h"
 #include "main.h"
 #include "cmsis_os2.h"
-#include <lvgl.h>
 
 #define SCREEN_WIDTH  480
 #define SCREEN_HEIGHT 320
-extern screen_driver_t screen;
-
 static uint8_t buf1[UINT16_MAX];
 static uint8_t buf2[UINT16_MAX];
-
+extern screen_driver_t screen;
 extern indev_t indev;
 
 /**
@@ -62,17 +59,14 @@ static void lv_input_read(lv_indev_t* input, lv_indev_data_t* data) {
     }
 }
 
-void screen_task(void* argument) {
-    osDelay(150);
-    SLOG_DEBUG("screen_task started");
+void gui_init(void) {
     screen_init_driver();
-    SLOG_DEBUG("screen_task init driver");
+    SLOG_DEBUG("gui init screen driver");
     screen.init();
-    SLOG_DEBUG("screen_task init screen");
-    osDelay(150);
     HAL_GPIO_WritePin(LCD_LED_GPIO_Port, LCD_LED_Pin, GPIO_PIN_SET);
-    SLOG_DEBUG("screen_task init input device");
+    SLOG_DEBUG("gui init screen");
     indev_init();
+    SLOG_DEBUG("gui init input device");
 
     lv_init();
     lv_tick_set_cb(osKernelGetTickCount);
@@ -86,13 +80,13 @@ void screen_task(void* argument) {
             lv_indev_set_type(input, LV_INDEV_TYPE_POINTER);
             break;
         default:
-            SLOG_ERROR("Unsupported indev type");
+            SLOG_ERROR("unsupported indev type");
             break;
     }
     lv_indev_set_read_cb(input, lv_input_read);
+    SLOG_DEBUG("gui init lvgl");
+}
 
-    gui_sensmon_create_screen(lv_scr_act());
-    for (;;) {
-        osDelay(5);
-    }
+void gui_process(void) {
+    lv_timer_handler();
 }

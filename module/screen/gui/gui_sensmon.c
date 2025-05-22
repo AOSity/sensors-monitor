@@ -1,6 +1,6 @@
 /**
  * @file gui.c
- * @brief Contains graphical user interface
+ * @brief Sensors Monitor screen gui
  *
  * @author Andrii Horbul (andreyhorbggwp@gmail.com)
  */
@@ -178,8 +178,4 @@ void gui_sensmon_push_chart_value(sensor_data_type_t type, int32_t value) {
     /* Update chart series */
     lv_chart_set_next_value(sc->chart, sc->series, value);
     lv_chart_refresh(sc->chart);
-}
-
-void gui_process(void) {
-    lv_timer_handler();
 }

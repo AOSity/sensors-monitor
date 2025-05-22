@@ -72,18 +72,6 @@ const osThreadAttr_t CLI_attributes = {
   .stack_size = sizeof(CLIBuffer),
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for Screen */
-osThreadId_t ScreenHandle;
-uint32_t ScreenBuffer[ 1024 ];
-osStaticThreadDef_t ScreenControlBlock;
-const osThreadAttr_t Screen_attributes = {
-  .name = "Screen",
-  .cb_mem = &ScreenControlBlock,
-  .cb_size = sizeof(ScreenControlBlock),
-  .stack_mem = &ScreenBuffer[0],
-  .stack_size = sizeof(ScreenBuffer),
-  .priority = (osPriority_t) osPriorityRealtime,
-};
 /* Definitions for SerialLogging */
 osThreadId_t SerialLoggingHandle;
 uint32_t SerialLoggingBuffer[ 256 ];
@@ -98,7 +86,7 @@ const osThreadAttr_t SerialLogging_attributes = {
 };
 /* Definitions for Archivist */
 osThreadId_t ArchivistHandle;
-uint32_t ArchivistBuffer[ 1024 ];
+uint32_t ArchivistBuffer[ 2048 ];
 osStaticThreadDef_t ArchivistControlBlock;
 const osThreadAttr_t Archivist_attributes = {
   .name = "Archivist",
@@ -116,7 +104,6 @@ const osThreadAttr_t Archivist_attributes = {
 
 void startup_task(void *argument);
 void cli_task(void *argument);
-void screen_task(void *argument);
 void slog_print_task(void *argument);
 void archivist_task(void *argument);
 
@@ -154,9 +141,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of CLI */
   CLIHandle = osThreadNew(cli_task, NULL, &CLI_attributes);
-
-  /* creation of Screen */
-  ScreenHandle = osThreadNew(screen_task, NULL, &Screen_attributes);
 
   /* creation of SerialLogging */
   SerialLoggingHandle = osThreadNew(slog_print_task, NULL, &SerialLogging_attributes);
@@ -208,24 +192,6 @@ __weak void cli_task(void *argument)
     osDelay(1);
   }
   /* USER CODE END cli_task */
-}
-
-/* USER CODE BEGIN Header_screen_task */
-/**
-* @brief Function implementing the Screnn thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_screen_task */
-__weak void screen_task(void *argument)
-{
-  /* USER CODE BEGIN screen_task */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END screen_task */
 }
 
 /* USER CODE BEGIN Header_slog_print_task */
