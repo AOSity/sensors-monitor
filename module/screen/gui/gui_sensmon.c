@@ -140,6 +140,9 @@ void gui_sensmon_update_current_value(sensor_data_type_t type, int32_t value) {
     }
 
     if (!charts[type].initialized) {
+        if (value == LV_CHART_POINT_NONE) {
+            return;
+        }
         gui_sensmon_create_chart(type);
     }
 
@@ -177,6 +180,9 @@ void gui_sensmon_push_chart_value(sensor_data_type_t type, int32_t value) {
     }
 
     if (!charts[type].initialized) {
+        if (value == LV_CHART_POINT_NONE) {
+            return;
+        }
         gui_sensmon_create_chart(type);
     }
 
