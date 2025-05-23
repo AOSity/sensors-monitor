@@ -8,12 +8,15 @@
 #include "datetime.h"
 #include <stdbool.h>
 
-const int days_in_month[] = {
-    31, 28, 31, 30, 31, 30,
-    31, 31, 30, 31, 30, 31
-};
+uint8_t datetime_get_days_in_month(uint8_t month) {
+    const int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (month == 0 || month > 12) {
+        return 0;
+    }
+    return days_in_month[month];
+}
 
-static bool is_leap_year(int year) {
+bool datetime_is_leap_year(uint16_t year) {
     return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
 }
 
@@ -22,13 +25,13 @@ uint32_t datetime_to_timestamp(uint16_t year, uint8_t month, uint8_t day, uint8_
 
     /* Add days for previous years */
     for (int y = 1970; y < year; y++) {
-        days += is_leap_year(y) ? 366 : 365;
+        days += datetime_is_leap_year(y) ? 366 : 365;
     }
 
     /* Add days for previous months in current year */
     for (int m = 1; m < month; m++) {
-        days += days_in_month[m - 1];
-        if (m == 2 && is_leap_year(year)) {
+        days += datetime_get_days_in_month(m - 1);
+        if (m == 2 && datetime_is_leap_year(year)) {
             days += 1;
         }
     }
