@@ -202,8 +202,15 @@ void gui_sensmon_push_chart_value(sensor_data_type_t type, int32_t value) {
     int32_t min = sc->values[0];
     int32_t max = sc->values[0];
     for (int i = 1; i < sc->count; i++) {
-        if (sc->values[i] < min) min = sc->values[i];
-        if (sc->values[i] > max) max = sc->values[i];
+        if (sc->values[i] == LV_CHART_POINT_NONE) {
+            continue;
+        }
+        if (sc->values[i] < min) {
+            min = sc->values[i];
+        }
+        if (sc->values[i] > max) {
+            max = sc->values[i];
+        }
     }
     lv_chart_set_range(sc->chart, LV_CHART_AXIS_PRIMARY_Y, (lv_coord_t)min, (lv_coord_t)max);
 
