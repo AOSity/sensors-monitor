@@ -101,12 +101,12 @@ void archivist_task(void* argument) {
     memory.init();
     SLOG_DEBUG("memory id: 0x%06X", memory.get_id());
 
-    memory_scan();
-
-    while (!gui_sensmon_screen_ready()) {
+    while (!gui_is_datetime_configured()) {
         gui_process();
         osDelay(5);
     }
+
+    memory_scan();
 
     osTimerId_t sensor_read_periodic = osTimerNew(sensor_read_periodic_cb, osTimerPeriodic, NULL, NULL);
     osTimerStart(sensor_read_periodic, SENSOR_READ_VALUE_PERIOD_S * 1000);

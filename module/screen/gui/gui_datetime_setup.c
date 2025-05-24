@@ -1,5 +1,5 @@
 /**
- * @file gui.c
+ * @file gui_datetime_setup.c
  * @brief Sensors Monitor screen gui
  *
  * @author Andrii Horbul (andreyhorbggwp@gmail.com)
@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static volatile bool is_screen_initialized = false;
+static volatile bool is_datetime_configured = false;
 
 static lv_obj_t* main_container;
 static lv_obj_t* title_label;
@@ -20,6 +20,17 @@ static lv_obj_t* roller_month;
 static lv_obj_t* roller_year;
 static lv_obj_t* roller_hour;
 static lv_obj_t* roller_minute;
+
+static void gui_datetime_screen_deinit(void) {
+    lv_obj_delete(main_container);
+    main_container = NULL;
+    title_label = NULL;
+    roller_day = NULL;
+    roller_month = NULL;
+    roller_year = NULL;
+    roller_hour = NULL;
+    roller_minute = NULL;
+}
 
 static void save_btn_event_cb(lv_event_t* e) {
     uint8_t day = lv_roller_get_selected(roller_day) + 1;
@@ -32,7 +43,8 @@ static void save_btn_event_cb(lv_event_t* e) {
     HAL_RTC_SetDate(&hrtc, &date, RTC_FORMAT_BCD);
     HAL_RTC_SetTime(&hrtc, &time, RTC_FORMAT_BCD);
     gui_datetime_screen_deinit();
-    gui_sensmon_screen_init(lv_scr_act());
+    gui_manager_init();
+    is_datetime_configured = true;
 }
 
 static lv_obj_t* create_labeled_roller(lv_obj_t* parent, const char* label_text, uint16_t min_value, uint16_t max_value) {
@@ -118,21 +130,8 @@ void gui_datetime_screen_init(lv_obj_t* parent) {
     lv_label_set_text(label, "Save");
     lv_obj_center(label);
     lv_obj_add_event_cb(btn_save, save_btn_event_cb, LV_EVENT_CLICKED, NULL);
-    is_screen_initialized = true;
 }
 
-void gui_datetime_screen_deinit(void) {
-    is_screen_initialized = false;
-    lv_obj_delete(main_container);
-    main_container = NULL;
-    title_label = NULL;
-    roller_day = NULL;
-    roller_month = NULL;
-    roller_year = NULL;
-    roller_hour = NULL;
-    roller_minute = NULL;
-}
-
-bool gui_datetime_screen_ready(void) {
-    return is_screen_initialized;
+bool gui_is_datetime_configured(void) {
+    return is_datetime_configured;
 }

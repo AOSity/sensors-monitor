@@ -12,8 +12,6 @@
 #include "main.h"
 #include "cmsis_os2.h"
 
-#define SCREEN_WIDTH  480
-#define SCREEN_HEIGHT 320
 static uint8_t buf1[UINT16_MAX];
 static uint8_t buf2[UINT16_MAX];
 extern screen_driver_t screen;
@@ -86,6 +84,7 @@ void gui_init(void) {
     lv_indev_set_read_cb(input, lv_input_read);
     SLOG_DEBUG("gui init lvgl");
 
+    gui_sensmon_data_init();
     gui_datetime_screen_init(lv_scr_act());
 }
 
