@@ -12,8 +12,8 @@
 
 typedef union {
     struct {
-        int32_t timestamp;
-        uint32_t value;
+        uint32_t timestamp;
+        int32_t value;
     };
     uint8_t raw[8];
 } memory_entry_t;
